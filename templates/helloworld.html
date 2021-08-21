@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+	<head>
+ 		<title>Social Rating</title>
+	</head>
+	<style>
+		table {
+			border-collapse: collapse;
+			border: 1px solid black;
+		}
+		table td{
+			border-collapse: collapse;
+			border: 1px solid black;
+		}
+	</style>
+	<body>
+		<a href="/download"> Download sqlite3 database</a>
+		<p align="center" size="30" id="lengthText">Length {{data|length}}</p>
+		<input type="text" id="guild" onkeyup="search()" placeholder="Search for guilds..">
+		<input type="text" id="member" onkeyup="search()" placeholder="Search for members..">
+		<table width="100%" id="myTable">
+		<tr>
+			<td> </td>
+			<td>Guild ID</td>
+			<td>Member ID</td>
+			<td>Rating</td>
+			<td>Actions</td>
+		</tr>
+		{% for item in data %}
+		<tr>
+				<td id={{loop.index}}>{{loop.index}}</td>
+				<td>{{item[0]}}</td>
+				<td>{{item[1]}}</td>
+				<td>{{item[2]}}</td>
+				<td>{{item[3]}}</td>
+		</tr>
+		{% endfor %}
+		</table>
+	</body>
+	<script>
+	function search() {
+		// Declare variables
+		var input, filter, table, tr, td, i, txtValue, length;
+		inputGuild = document.getElementById("guild");
+		inputMember = document.getElementById("member");
+		filterGuild = inputGuild.value.toUpperCase();
+		filterMember = inputMember.value.toUpperCase();
+		table = document.getElementById("myTable");
+		tr = table.getElementsByTagName("tr");
+		length=0
+		// Loop through all table rows, and hide those who don't match the search query
+		for (i = 0; i < tr.length; i++) {
+			index = tr[i].getElementsByTagName("td")[0];
+			tdGuild = tr[i].getElementsByTagName("td")[1];
+			tdMember = tr[i].getElementsByTagName("td")[2];
+			if (tdGuild && tdMember) {
+				txtValue = tdGuild.textContent || tdGuild.innerText;
+				textValue = tdMember.textContent || tdMember.innerText;
+				indexText = tdMember.textContent || tdMember.innerText;
+				if (txtValue.toUpperCase().indexOf(filterGuild) > -1 && textValue.toUpperCase().indexOf(filterMember) > -1 ) {
+					tr[i].style.display = "";
+					length+=1
+					document.getElementById(i).innerHTML = length;
+				} else {
+					tr[i].style.display = "none";
+				}
+			}
+		}
+		document.getElementById("lengthText").innerHTML = "Length "+length;
+	}
+	</script>
+</html>
