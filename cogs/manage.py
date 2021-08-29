@@ -1,4 +1,5 @@
 import os, discord, random, sqlite3, json, aiocron, glob
+import numpy as np
 from datetime import datetime
 from discord.ext import commands 
 from operator import itemgetter
@@ -372,5 +373,29 @@ class Manager(commands.Cog):
 			embed=discord.Embed(title="Внимание", description=f"Вы достигли дневного ограничения! Дождитесь до завтра, осталось {delta}", color=0xFF0000)
 			await ctx.send(embed=embed)
 		conn.commit()
+
+	@commands.command(help = "Очистить базу данных от участников которых нет в сервере", brief="Очистить бд от лишнего",aliases=["cl"])
+	@commands.has_permissions(administrator=True)
+	async def clear(self, ctx):
+		try:
+			usersInDataBase=[]
+			usersInGuild=ctx.guild.members
+			cursor.execute(f"SELECT * FROM members where guildID={ctx.guild.id}")
+			results = cursor.fetchall()
+			for row in results:
+				usersInDataBase.append(row[1])
+			for row in usersInDataBase:
+				if self.client.get_user(row) in usersInGuild:
+					usersInDataBase.remove(row)
+			mlist=[row for row in usersInDataBase if self.client.get_user(row) not in usersInGuild]
+			for row in mlist:
+				cursor.execute(f"DELETE FROM members where guildID={ctx.guild.id} and memberID={row}")
+			conn.commit()
+			embed=discord.Embed(title="Внимание", description=f"Очищено {len(mlist)} строк.", color=0xFF0000)
+			await ctx.send(embed=embed)
+		except Exception as err:
+			print(e)
+		
+
 def setup(client):
 	client.add_cog(Manager(client))
